@@ -33,4 +33,10 @@ Finally open  the directory and in the commandline run   `pip freeze > requireme
 
 Thre are 3 ways to deploy on heroku
 
+# 1.Via GitHub Repo
+
+# 2. Via Heroku CLI
+
+# 3.Pipeline
+
 
