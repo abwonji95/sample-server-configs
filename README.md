@@ -25,4 +25,12 @@ Add ` STATIC_ROOT=os.path.join(BASE_DIR, 'static')`  to `Settings.py`
 
 Add `'whitenoise.middleware.WhiteNoiseMiddleware',` Middleware to `Settings.py`
 
+Add `ALLOWED_HOSTS=[*webiste@example.com*,*localhost:8000* ]` to `Settings.py`
+
+then Create a `Procfile` sample provided
+
+Finally open  the directory and in the commandline run   `pip freeze > requirements.txt` to generate your required application dependencies.
+
+Thre are 3 ways to deploy on heroku
+
 
