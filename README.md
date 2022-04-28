@@ -21,4 +21,8 @@ Steps Deploying Django application on Heroku.
 
 Remember to add them to `Settings.py`
 
-then add # STATIC_ROOT=os.path.join(BASE_DIR, 'static')
+Add ` STATIC_ROOT=os.path.join(BASE_DIR, 'static')`  to `Settings.py`
+
+Add `'whitenoise.middleware.WhiteNoiseMiddleware',` Middleware to `Settings.py`
+
+
