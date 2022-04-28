@@ -11,3 +11,14 @@ languages
 #2 . Django -Backend,
 
 #3 . Node-Js -Server-side
+
+
+Steps Deploying Django application on Heroku.
+
+`Pip install whitenoise `
+
+`Pip install gunicorn `
+
+Remember to add them to `Settings.py`
+
+then add # STATIC_ROOT=os.path.join(BASE_DIR, 'static')
