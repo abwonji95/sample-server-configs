@@ -34,6 +34,14 @@ Finally open  the directory and in the commandline run   `pip freeze > requireme
 Thre are 3 ways to deploy on heroku
 
 # 1.Via GitHub Repo
+  1.Login to your Heroku Account
+  2.on the Dashboard click `NEW` then `create new app` name your application ,finnally click `create app`
+  3.Once redirected click `github connect to github` then click the button `connect to Github` 
+  4.you will be redirected and promoted to login to your github account.
+  5. After login ,select the repo you want to deploy 
+  6. select the branch
+  7. choose whether  you want `Automatic Deployment`  or not 
+  8. Finished. 
 
 # 2. Via Heroku CLI
 
