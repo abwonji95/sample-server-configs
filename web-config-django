@@ -17,4 +17,9 @@
     <add key="WSGI_HANDLER" value="webproject.wsgi.application" />
     <add key="DJANGO_SETTINGS_MODULE" value="webproject.settings" />
   </appSettings>
+  <system.net>
+    <defaultProxy>
+      <proxy proxyaddress= "http://yourProxy>:Port" bypassonlocal="true"/>
+    </defaultProxy>
+</system.net>
 </configuration>
