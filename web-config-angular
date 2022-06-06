@@ -28,5 +28,9 @@
         </redirectHeaders>
     </httpProto
 </system.webServer>
-
+<system.net>
+    <defaultProxy>
+      <proxy proxyaddress= "http://yourProxy>:Port" bypassonlocal="true"/>
+    </defaultProxy>
+</system.net>
 </configuration>
