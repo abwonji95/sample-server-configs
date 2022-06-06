@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	The Kyrion web.config
+
+    PLEASE READ THE README.md FILE BEFORE TRYING TO USE THIS ON YOUR SITE.
+-->
+<configuration>
+	<system.webServer>
+		<!-- File execution order -->
+		<defaultDocument enabled="true">
+			<files>
+				<clear />
+				<add value="index.php" />
+				<add value="index.html" />
+				<add value="index.htm" />
+			</files>
+		</defaultDocument>
+		<!-- No directory listings -->
+		<directoryBrowse enabled="false" />
+		<!-- Optimal default expiration time // Send ETag: false (IIS only supports true/false for ETags) -->
+		<staticContent>
+			<clientCache cacheControlMode="UseMaxAge" cacheControlMaxAge="01:00:00" setEtag="false" />
+		</staticContent>
+		<urlCompression doStaticCompression="false" doDynamicCompression="true" />
+		<httpCompression>
+			<dynamicTypes>
+				<clear />
+				<add mimeType="text/*" enabled="true" />
+				<add mimeType="message/*" enabled="true" />
+				<add mimeType="application/xml" enabled="true" />
+				<add mimeType="application/xhtml+xml" enabled="true" />
+				<add mimeType="application/rss+xml" enabled="true" />
+				<add mimeType="application/javascript" enabled="true" />
+				<add mimeType="application/x-javascript" enabled="true" />
+				<add mimeType="image/svg+xml" enabled="true" />
+				<add mimeType="*/*" enabled="false" />
+			</dynamicTypes>
+		</httpCompression>
+		<rewrite>
+			<rules>
+				<clear />
+				<rule name="Common hacking tools and bandwidth hoggers block" stopProcessing="true">
+					<match url=".*" />
+					<conditions logicalGrouping="MatchAny" trackAllCaptures="false">
+						<add input="{HTTP_USER_AGENT}" pattern="WebBandit|webbandit|Acunetix|binlar|BlackWidow|Bolt 0|Bot mailto:craftbot@yahoo.com|BOT for JCE|casper|checkprivacy|ChinaClaw|clshttp|cmsworldmap|comodo|Custo|Default Browser 0|diavol|DIIbot|DISCo|dotbot|Download Demon|eCatch|EirGrabber|EmailCollector|EmailSiphon|EmailWolf|Express WebPictures|extract|ExtractorPro|EyeNetIE|feedfinder|FHscan|FlashGet|flicky|GetRight|GetWeb!|Go-Ahead-Got-It|Go!Zilla|grab|GrabNet|Grafula|harvest|HMView|ia_archiver|Image Stripper|Image Sucker|InterGET|Internet Ninja|InternetSeer.com|jakarta|Java|JetCar|JOC Web Spider|kmccrew|larbin|LeechFTP|libwww|Mass Downloader|Maxthon$|microsoft.url|MIDown tool|miner|Mister PiX|NEWT|MSFrontPage|Navroad|NearSite|Net Vampire|NetAnts|NetSpider|NetZIP|nutch|Octopus|Offline Explorer|Offline Navigator|PageGrabber|Papa Foto|pavuk|pcBrowser|PeoplePal|planetwork|psbot|purebot|RealDownload|ReGet|Rippers 0|SeaMonkey$|sitecheck.internetseer.com|SiteSnagger|skygrid|SmartDownload|sucker|SuperBot|SuperHTTP|Surfbot|tAkeOut|Teleport Pro|Toata dragostea mea pentru diavola|turnit|vikspider|VoidEYE|Web Image Collector|Web Sucker|WebAuto|WebCopier|WebFetch|WebGo IS|WebLeacher|WebReaper|WebSauger|Website eXtractor|Website Quester|WebStripper|WebWhacker|WebZIP|Widow|WWW-Mechanize|WWWOFFLE|Xaldon WebSpider|Yandex|Zeus|zmeu|CazoodleBot|discobot|ecxi|GT::WWW|heritrix|HTTP::Lite|HTTrack|ia_archiver|id-search|id-search.org|IDBot|Indy Library|IRLbot|ISC Systems iRc Search 2.1|LinksManager.com_bot|linkwalker|lwp-trivial|MFC_Tear_Sample|Microsoft URL Control|Missigua Locator|panscient.com|PECL::HTTP|PHPCrawl|PleaseCrawl|SBIder|Snoopy|Steeler|URI::Fetch|urllib|Web Sucker|webalta|WebCollage|Wells Search II|WEP Search|zermelo|ZyBorg|Indy Library|libwww-perl|Go!Zilla|TurnitinBot|sqlmap" />
+
+					</conditions>
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden: Access is denied." statusDescription="You do not have permission to view this directory or page using the credentials that you supplied." />
+				</rule>
+				<rule name="Redirect index.php to /" stopProcessing="true">
+					<match url="^index\.php$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{THE_REQUEST}" pattern="^POST" ignoreCase="false" negate="true" />
+						<add input="{THE_REQUEST}" pattern="^[A-Z]{3,9}\ /index\.php\ HTTP/" ignoreCase="false" />
+						<add input="{HTTPS}>s" pattern="^(1>(s)|0>s)$" ignoreCase="false" />
+					</conditions>
+					<action type="Redirect" url="http{C:2}://{HTTP_HOST}:{SERVER_PORT }/" redirectType="Permanent" />
+				</rule>
+				<rule name="Redirect non-www to www" stopProcessing="true">
+					<match url="^(.*)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{HTTP_HOST}" pattern="^www\." negate="true" />
+					</conditions>
+					<action type="Redirect" url="http://www.{HTTP_HOST}/{R:1}" redirectType="Found" />
+				</rule>
+				<rule name="Redirect old to new domain (example.net)" stopProcessing="true">
+					<match url="(.*)" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll">
+						<add input="{HTTP_HOST}" pattern="^example\.net" />
+					</conditions>
+					<action type="Redirect" url="http://www.example.com/{R:1}" redirectType="Found" />
+				</rule>
+                <!-- Force HTTPS for certain pages -->
+				<rule name="Force HTTPS for foo/bar/example.html" stopProcessing="true">
+					<match url="^^foo\/bar\/example\.html$$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAny">
+						<add input="{HTTPS}" pattern="0" />
+					</conditions>
+					<action type="Redirect" url="https://www.example.com/foo/bar/example.html" redirectType="Found" />
+				</rule>
+				<rule name="Block out some common exploits">
+					<match url=".*" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAny" trackAllCaptures="false">
+						<add input="{QUERY_STRING}" pattern="proc/self/environ" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="mosConfig_[a-zA-Z_]{1,21}(=|\%3D)" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="base64_(en|de)code\(.*\)" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="(&lt;|%3C).*script.*(>|%3E)" />
+						<add input="{QUERY_STRING}" pattern="GLOBALS(=|\[|\%[0-9A-Z]{0,2})" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="_REQUEST(=|\[|\%[0-9A-Z]{0,2})" ignoreCase="false" />
+					</conditions>
+					<action type="CustomResponse" url="index.php" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="File injection protection" stopProcessing="true">
+					<match url=".*" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAny" trackAllCaptures="false">
+						<add input="{QUERY_STRING}" pattern="[a-zA-Z0-9_]=http://" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="[a-zA-Z0-9_]=(\.\.//?)+" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="[a-zA-Z0-9_]=/([a-z0-9_.]//?)+" />
+					</conditions>
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+                <!-- Advanced server protection rules exceptions -->
+				<rule name="Advanced server protection rules exception #1" stopProcessing="true">
+					<match url="^administrator\/components\/com_akeeba\/restore\.php$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Advanced server protection rules exception #3" stopProcessing="true">
+					<match url="^administrator\/components\/com_joomlaupdate\/restore\.php$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Allow access to folders except .php files #1" stopProcessing="true">
+					<match url="^\.well\-known/" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false">
+						<add input="{REQUEST_FILENAME}" pattern="(\.php)$" ignoreCase="false" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" ignoreCase="false" />
+					</conditions>
+					<action type="None" />
+				</rule>
+				<rule name="Allow access to folders, including .php files #1" stopProcessing="true">
+					<match url="^templates\/your_template_name_here/" ignoreCase="false" />
+					<action type="None" />
+				</rule>
+				<rule name="PHP Easter Egg protection">
+					<match url=".*" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false">
+						<add input="{QUERY_STRING}" pattern="\=PHP[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
+					</conditions>
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Back-end protection - allow administrator login" stopProcessing="true">
+					<match url="^administrator/?$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Back-end protection - allow administrator login, alternate" stopProcessing="true">
+					<match url="^administrator/index\.(php|html?)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Back-end protection - allow access to static media files" stopProcessing="true">
+					<match url="^administrator/(components|modules|templates|images|plugins)/.*\.(jpe|jpg|jpeg|jp2|jpe2|png|gif|bmp|css|js|swf|html|mpg|mp3|mpeg|mp4|avi|wav|ogg|ogv|xls|xlsx|doc|docx|ppt|pptx|zip|rar|pdf|xps|txt|7z|svg|odt|ods|odp|flv|mov|htm|ttf|woff|woff2|eot|webp|JPG|JPEG|PNG|GIF|CSS|JS|TTF|WOFF|WOFF2|EOT|WEBP)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Back-end protection - Catch all">
+					<match url="^administrator/" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Front-end protection - allow access to static media files" stopProcessing="true">
+					<match url="^(components|modules|templates|images|plugins|media|libraries|media/jui/fonts)/.*\.(jpe|jpg|jpeg|jp2|jpe2|png|gif|bmp|css|js|swf|html|mpg|mp3|mpeg|mp4|avi|wav|ogg|ogv|xls|xlsx|doc|docx|ppt|pptx|zip|rar|pdf|xps|txt|7z|svg|odt|ods|odp|flv|mov|ico|htm|ttf|woff|woff2|eot|webp|JPG|JPEG|PNG|GIF|CSS|JS|TTF|WOFF|WOFF2|EOT|WEBP)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Front-end protection - Do not block includes/js" stopProcessing="true">
+					<match url="^includes/js/" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="None" />
+				</rule>
+				<rule name="Front-end protection - Block access to certain folders">
+					<match url="^(components|modules|templates|images|plugins|media|libraries|media/jui/fonts)/" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Front-end protection - Block access to certain folders, part 2">
+					<match url="^(cache|includes|language|logs|log|tmp)/" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Front-end protection - Forbid access to leftover Joomla! files">
+					<match url="^(configuration\.php|CONTRIBUTING\.md|htaccess\.txt|joomla\.xml|LICENSE\.txt|phpunit\.xml|README\.txt|web\.config\.txt)" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Front-end protection - Block access to all PHP files except index.php">
+					<match url="(.*\.php)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false">
+						<add input="{REQUEST_FILENAME}" pattern="(\.php)$" ignoreCase="false" />
+						<add input="{REQUEST_FILENAME}" pattern="(/index?\.php)$" ignoreCase="false" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" ignoreCase="false" />
+					</conditions>
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Front-end protection - Block access to common server configuration files">
+					<match url="^(htaccess\.txt|configuration\.php-dist|php\.ini|.user\.ini|web\.config|web\.config\.txt)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false" />
+					<action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Joomla! Common Exploits Prevention" stopProcessing="true">
+					<match url="^(.*)$" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAny" trackAllCaptures="false">
+						<add input="{QUERY_STRING}" pattern="base64_encode[^(]*\([^)]*\)" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="(>|%3C)([^s]*s)+cript.*(&lt;|%3E)" />
+						<add input="{QUERY_STRING}" pattern="GLOBALS(=|\[|\%[0-9A-Z]{0,2})" ignoreCase="false" />
+						<add input="{QUERY_STRING}" pattern="_REQUEST(=|\[|\%[0-9A-Z]{0,2})" ignoreCase="false" />
+					</conditions>
+					<action type="CustomResponse" url="index.php" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" />
+				</rule>
+				<rule name="Joomla! SEF Rule 2">
+					<match url="(.*)" ignoreCase="false" />
+					<conditions logicalGrouping="MatchAll" trackAllCaptures="false">
+						<add input="{URL}" pattern="^/index.php" ignoreCase="true" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsFile" ignoreCase="false" negate="true" />
+						<add input="{REQUEST_FILENAME}" matchType="IsDirectory" ignoreCase="false" negate="true" />
+					</conditions>
+					<action type="Rewrite" url="index.php" />
+				</rule>
+
+			</rules>
+		<!-- Remove IIS version signature -->
+		<outboundRules>
+		  <rule name="Remove RESPONSE_Server">
+			<match serverVariable="RESPONSE_Server" pattern=".+" />
+			<action type="Rewrite" value="MYOB" />
+		  </rule>
+		</outboundRules>
+		</rewrite>
+		<httpProtocol>
+			<customHeaders>
+				<!-- Remove IIS and PHP version signature -->
+				<remove name="X-Powered-By" />
+				<add name="X-Powered-By" value="MYOB" />
+				<remove name="X-Content-Powered-By" />
+				<add name="X-Content-Powered-By" value="MYOB" />
+				<!-- HSTS Header - See http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security -->
+				<add name="Strict-Transport-Security" value="max-age=31536000" />
+				<!-- Referrer-policy -->
+				<add name="Referrer-Policy" value="no-referrer-when-downgrade" />
+			</customHeaders>
+		</httpProtocol>
+	</system.webServer>
+</configuration>
