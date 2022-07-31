@@ -44,12 +44,9 @@ Thre are 3 ways to deploy on heroku
   
   5. After login ,select the repo you want to deploy
 
-
   6. select the branch
 
-
   7. choose whether  you want `Automatic Deployment`  or not
-
 
   8. Finished. 
 
