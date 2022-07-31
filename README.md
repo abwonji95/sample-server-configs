@@ -60,14 +60,19 @@ Prerequiresites :
 1.install `Heroku CLI` and `GIT CLI`
 
 2. initialize your repo `git init`
+
 3. then `git add . `
+
 4. then `git commit m "first commmit"`
+
 5. then create heroku remote using `heroku create -a example-app`
+
 6. For existing app in heroku use `heroku git:remote -a example-app`
+
 7.  to rename use git `remote rename heroku app-new-name`
+
 8.  Now you can Deploy using `git push heroku main` or `git push heroku testbranch:main` for 
   other branches except main
 
-# 3.Pipeline
 
 
